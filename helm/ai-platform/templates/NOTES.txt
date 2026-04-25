@@ -1,0 +1,10 @@
+1. Install the chart:
+   helm upgrade --install ai-platform ./helm/ai-platform -n ai-platform --create-namespace
+
+2. Verify resources:
+   kubectl get all -n {{ .Release.Namespace }}
+
+3. For ingress-based access:
+   kubectl get ingress -n {{ .Release.Namespace }}
+
+4. Update image tags, secrets, ingress host, and storage class values before production use.

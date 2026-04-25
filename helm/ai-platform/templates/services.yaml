@@ -1,0 +1,23 @@
+{{- range $name, $service := .Values.services }}
+{{- if $service.enabled }}
+{{- $componentName := include "ai-platform.componentName" $name }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $componentName }}
+  namespace: {{ $.Release.Namespace }}
+  labels:
+    {{- include "ai-platform.componentLabels" (dict "root" $ "component" $name) | nindent 4 }}
+    {{- include "ai-platform.labels" $ | nindent 4 }}
+spec:
+  type: {{ $service.service.type }}
+  selector:
+    {{- include "ai-platform.componentLabels" (dict "root" $ "component" $name) | nindent 4 }}
+  ports:
+    - name: http
+      port: {{ $service.service.port }}
+      targetPort: {{ $service.containerPort }}
+      protocol: TCP
+{{- end }}
+{{- end }}

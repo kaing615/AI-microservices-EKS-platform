@@ -1,0 +1,50 @@
+namespace:
+  create: true
+
+ingress:
+  enabled: false
+
+secret:
+  jwtSecret: "minikube-change-me"
+
+services:
+  frontend:
+    replicaCount: 1
+    image:
+      repository: ai-microservices-eks-platform-frontend
+      tag: latest
+      pullPolicy: IfNotPresent
+  apiGateway:
+    replicaCount: 1
+    image:
+      repository: ai-microservices-eks-platform-api-gateway
+      tag: latest
+      pullPolicy: IfNotPresent
+    hpa:
+      enabled: false
+  authService:
+    replicaCount: 1
+    image:
+      repository: ai-microservices-eks-platform-auth-service
+      tag: latest
+      pullPolicy: IfNotPresent
+    persistence:
+      size: 512Mi
+  predictionService:
+    replicaCount: 1
+    image:
+      repository: ai-microservices-eks-platform-prediction-service
+      tag: latest
+      pullPolicy: IfNotPresent
+    hpa:
+      enabled: false
+    persistence:
+      size: 512Mi
+  aiInferenceService:
+    replicaCount: 1
+    image:
+      repository: ai-microservices-eks-platform-ai-inference-service
+      tag: latest
+      pullPolicy: IfNotPresent
+    hpa:
+      enabled: false

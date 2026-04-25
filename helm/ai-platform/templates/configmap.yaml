@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "ai-platform.fullname" . }}-config
+  namespace: {{ .Release.Namespace }}
+data:
+  AUTH_PORT: {{ .Values.config.authPort | quote }}
+  PREDICTION_PORT: {{ .Values.config.predictionPort | quote }}
+  GATEWAY_PORT: {{ .Values.config.gatewayPort | quote }}
+  AI_INFERENCE_PORT: {{ .Values.config.aiInferencePort | quote }}
+  AUTH_SERVICE_URL: {{ .Values.config.authServiceUrl | quote }}
+  PREDICTION_SERVICE_URL: {{ .Values.config.predictionServiceUrl | quote }}
+  AI_INFERENCE_SERVICE_URL: {{ .Values.config.aiInferenceServiceUrl | quote }}
+  AI_MODEL_NAME: {{ .Values.config.aiModelName | quote }}
+  JWT_EXPIRES_IN: {{ .Values.config.jwtExpiresIn | quote }}

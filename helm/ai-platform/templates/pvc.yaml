@@ -1,0 +1,23 @@
+{{- range $name, $service := .Values.services }}
+{{- if and $service.enabled $service.persistence $service.persistence.enabled }}
+{{- $componentName := include "ai-platform.componentName" $name }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ $componentName }}-data
+  namespace: {{ $.Release.Namespace }}
+  labels:
+    {{- include "ai-platform.componentLabels" (dict "root" $ "component" $name) | nindent 4 }}
+    {{- include "ai-platform.labels" $ | nindent 4 }}
+spec:
+  accessModes:
+    {{- toYaml $service.persistence.accessModes | nindent 4 }}
+  resources:
+    requests:
+      storage: {{ $service.persistence.size }}
+  {{- with $service.persistence.storageClassName }}
+  storageClassName: {{ . }}
+  {{- end }}
+{{- end }}
+{{- end }}
