@@ -1,0 +1,31 @@
+namespace:
+  create: true
+
+ingress:
+  enabled: true
+  host: dev.ai-platform.local
+
+secret:
+  jwtSecret: "dev-change-me"
+
+services:
+  frontend:
+    replicaCount: 1
+  apiGateway:
+    replicaCount: 1
+    hpa:
+      enabled: false
+  authService:
+    replicaCount: 1
+    persistence:
+      size: 512Mi
+  predictionService:
+    replicaCount: 1
+    hpa:
+      enabled: false
+    persistence:
+      size: 512Mi
+  aiInferenceService:
+    replicaCount: 1
+    hpa:
+      enabled: false

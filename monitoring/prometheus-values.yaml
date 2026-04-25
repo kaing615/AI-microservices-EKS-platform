@@ -1,0 +1,11 @@
+grafana:
+  adminPassword: Ndt@0611_
+  service:
+    type: ClusterIP
+
+prometheus:
+  prometheusSpec:
+    serviceMonitorSelectorNilUsesHelmValues: false
+
+alertmanager:
+  enabled: true

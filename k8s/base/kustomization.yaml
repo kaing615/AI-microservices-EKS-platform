@@ -1,0 +1,11 @@
+resources:
+  - namespace.yaml
+  - configmap.yaml
+  - secret.yaml
+  - api-gateway.yaml
+  - auth-service.yaml
+  - prediction-service.yaml
+  - ai-inference-service.yaml
+  - frontend.yaml
+  - ingress.yaml
+

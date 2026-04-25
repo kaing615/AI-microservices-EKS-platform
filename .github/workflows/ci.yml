@@ -1,0 +1,55 @@
+name: CI
+
+on:
+  push:
+    branches: ["main", "develop"]
+  pull_request:
+
+jobs:
+  node-services:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        service: [frontend, api-gateway, auth-service, prediction-service]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Install dependencies
+        working-directory: ${{ matrix.service }}
+        run: npm install
+
+      - name: Build frontend
+        if: matrix.service == 'frontend'
+        working-directory: frontend
+        run: npm run build
+
+      - name: Docker build
+        run: docker build -t ${{ matrix.service }}:ci ./${{ matrix.service }}
+
+  ai-inference-service:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        working-directory: ai-inference-service
+        run: pip install -r requirements.txt
+
+      - name: Syntax check
+        run: python -m py_compile ai-inference-service/app/main.py
+
+      - name: Docker build
+        run: docker build -t ai-inference-service:ci ./ai-inference-service
+

@@ -1,0 +1,26 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: api-gateway
+  namespace: production
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: api-gateway
+  template:
+    metadata:
+      labels:
+        app: api-gateway
+    spec:
+      containers:
+        - name: api-gateway
+          image: 123456789012.dkr.ecr.ap-southeast-1.amazonaws.com/api-gateway:stable
+          ports:
+            - containerPort: 4000
+  strategy:
+    blueGreen:
+      activeService: api-gateway
+      previewService: api-gateway-preview
+      autoPromotionEnabled: false
+

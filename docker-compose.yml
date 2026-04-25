@@ -1,0 +1,52 @@
+services:
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        VITE_API_BASE_URL: http://localhost:4000
+    ports:
+      - "3000:80"
+    depends_on:
+      - api-gateway
+
+  api-gateway:
+    build:
+      context: ./api-gateway
+    ports:
+      - "4000:4000"
+    environment:
+      GATEWAY_PORT: 4000
+      AUTH_SERVICE_URL: http://auth-service:4001
+      PREDICTION_SERVICE_URL: http://prediction-service:4002
+    depends_on:
+      - auth-service
+      - prediction-service
+
+  auth-service:
+    build:
+      context: ./auth-service
+    ports:
+      - "4001:4001"
+    environment:
+      AUTH_PORT: 4001
+      JWT_SECRET: change-me
+
+  prediction-service:
+    build:
+      context: ./prediction-service
+    ports:
+      - "4002:4002"
+    environment:
+      PREDICTION_PORT: 4002
+      JWT_SECRET: change-me
+      AI_INFERENCE_SERVICE_URL: http://ai-inference-service:8000
+    depends_on:
+      - ai-inference-service
+
+  ai-inference-service:
+    build:
+      context: ./ai-inference-service
+    ports:
+      - "8000:8000"
+    environment:
+      AI_MODEL_NAME: demo-sentiment-v1

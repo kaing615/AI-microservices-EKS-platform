@@ -1,0 +1,25 @@
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: api-gateway
+  namespace: production
+spec:
+  hosts:
+    - example.com
+  gateways:
+    - ai-platform-gateway
+  http:
+    - match:
+        - uri:
+            prefix: /api
+      route:
+        - destination:
+            host: api-gateway
+            subset: stable
+          weight: 100
+    - route:
+        - destination:
+            host: frontend
+            subset: stable
+          weight: 100
+

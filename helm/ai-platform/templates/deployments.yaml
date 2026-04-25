@@ -1,0 +1,98 @@
+{{- $root := . -}}
+{{- range $name, $service := .Values.services }}
+{{- if $service.enabled }}
+{{- $componentName := include "ai-platform.componentName" $name }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $componentName }}
+  namespace: {{ $root.Release.Namespace }}
+  labels:
+    {{- include "ai-platform.componentLabels" (dict "root" $root "component" $name) | nindent 4 }}
+    {{- include "ai-platform.labels" $root | nindent 4 }}
+spec:
+  replicas: {{ $service.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "ai-platform.componentLabels" (dict "root" $root "component" $name) | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "ai-platform.componentLabels" (dict "root" $root "component" $name) | nindent 8 }}
+      annotations:
+        checksum/config: {{ include (print $root.Template.BasePath "/configmap.yaml") $root | sha256sum }}
+        {{- if $service.envFromSecret }}
+        checksum/secret: {{ include (print $root.Template.BasePath "/secret.yaml") $root | sha256sum }}
+        {{- end }}
+        {{- with $service.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      serviceAccountName: {{ include "ai-platform.serviceAccountName" $root }}
+      {{- if $root.Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml $root.Values.imagePullSecrets | nindent 8 }}
+      {{- end }}
+      {{- with $service.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $service.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with $service.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - name: {{ $componentName }}
+          image: "{{ $service.image.repository }}:{{ $service.image.tag }}"
+          imagePullPolicy: {{ $service.image.pullPolicy }}
+          ports:
+            - name: http
+              containerPort: {{ $service.containerPort }}
+              protocol: TCP
+          {{- if or $service.envFromConfig $service.envFromSecret }}
+          envFrom:
+            {{- if $service.envFromConfig }}
+            - configMapRef:
+                name: {{ include "ai-platform.fullname" $root }}-config
+            {{- end }}
+            {{- if $service.envFromSecret }}
+            - secretRef:
+                name: {{ include "ai-platform.fullname" $root }}-secrets
+            {{- end }}
+          {{- end }}
+          {{- with $service.env }}
+          env:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          resources:
+            {{- toYaml $service.resources | nindent 12 }}
+          readinessProbe:
+            httpGet:
+              path: {{ $service.probes.readiness.path }}
+              port: http
+            initialDelaySeconds: {{ $service.probes.readiness.initialDelaySeconds }}
+            periodSeconds: {{ $service.probes.readiness.periodSeconds }}
+          livenessProbe:
+            httpGet:
+              path: {{ $service.probes.liveness.path }}
+              port: http
+            initialDelaySeconds: {{ $service.probes.liveness.initialDelaySeconds }}
+            periodSeconds: {{ $service.probes.liveness.periodSeconds }}
+          {{- if and $service.persistence $service.persistence.enabled }}
+          volumeMounts:
+            - name: data
+              mountPath: {{ $service.persistence.mountPath }}
+          {{- end }}
+      {{- if and $service.persistence $service.persistence.enabled }}
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: {{ $componentName }}-data
+      {{- end }}
+{{- end }}
+{{- end }}

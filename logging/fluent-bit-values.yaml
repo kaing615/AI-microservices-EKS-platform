@@ -1,0 +1,34 @@
+serviceAccount:
+  create: true
+
+config:
+  service: |
+    [SERVICE]
+        Flush        1
+        Daemon       Off
+        Log_Level    info
+        Parsers_File parsers.conf
+  inputs: |
+    [INPUT]
+        Name              tail
+        Path              /var/log/containers/*.log
+        Parser            cri
+        Tag               kube.*
+        Mem_Buf_Limit     50MB
+        Skip_Long_Lines   On
+  filters: |
+    [FILTER]
+        Name                kubernetes
+        Match               kube.*
+        Merge_Log           On
+        Keep_Log            Off
+        K8S-Logging.Parser  On
+        K8S-Logging.Exclude Off
+  outputs: |
+    [OUTPUT]
+        Name   loki
+        Match  kube.*
+        Host   logging-loki.logging.svc.cluster.local
+        Port   3100
+        Labels job=fluent-bit, cluster=ai-platform
+

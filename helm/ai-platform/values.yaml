@@ -1,0 +1,238 @@
+namespace:
+  create: false
+
+imagePullSecrets: []
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+config:
+  authPort: "4001"
+  predictionPort: "4002"
+  gatewayPort: "4000"
+  aiInferencePort: "8000"
+  authServiceUrl: "http://auth-service:4001"
+  predictionServiceUrl: "http://prediction-service:4002"
+  aiInferenceServiceUrl: "http://ai-inference-service:8000"
+  aiModelName: "demo-sentiment-v1"
+  jwtExpiresIn: "2h"
+
+secret:
+  jwtSecret: "replace-me"
+
+ingress:
+  enabled: false
+  className: alb
+  host: app.example.com
+  annotations:
+    kubernetes.io/ingress.class: alb
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+  tls: []
+
+services:
+  frontend:
+    enabled: true
+    image:
+      repository: 123456789012.dkr.ecr.ap-southeast-1.amazonaws.com/frontend
+      tag: latest
+      pullPolicy: IfNotPresent
+    replicaCount: 2
+    containerPort: 80
+    service:
+      type: ClusterIP
+      port: 80
+    probes:
+      readiness:
+        path: /
+        initialDelaySeconds: 5
+        periodSeconds: 10
+      liveness:
+        path: /
+        initialDelaySeconds: 15
+        periodSeconds: 20
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      limits:
+        cpu: 300m
+        memory: 256Mi
+    env: []
+    envFromConfig: false
+    envFromSecret: false
+    podAnnotations: {}
+    nodeSelector: {}
+    tolerations: []
+    affinity: {}
+  apiGateway:
+    enabled: true
+    image:
+      repository: 123456789012.dkr.ecr.ap-southeast-1.amazonaws.com/api-gateway
+      tag: latest
+      pullPolicy: IfNotPresent
+    replicaCount: 2
+    containerPort: 4000
+    service:
+      type: ClusterIP
+      port: 80
+    probes:
+      readiness:
+        path: /health
+        initialDelaySeconds: 5
+        periodSeconds: 10
+      liveness:
+        path: /health
+        initialDelaySeconds: 15
+        periodSeconds: 20
+    hpa:
+      enabled: true
+      minReplicas: 2
+      maxReplicas: 5
+      averageUtilization: 70
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      limits:
+        cpu: 300m
+        memory: 256Mi
+    env: []
+    envFromConfig: true
+    envFromSecret: false
+    podAnnotations: {}
+    nodeSelector: {}
+    tolerations: []
+    affinity: {}
+  authService:
+    enabled: true
+    image:
+      repository: 123456789012.dkr.ecr.ap-southeast-1.amazonaws.com/auth-service
+      tag: latest
+      pullPolicy: IfNotPresent
+    replicaCount: 2
+    containerPort: 4001
+    service:
+      type: ClusterIP
+      port: 4001
+    probes:
+      readiness:
+        path: /health
+        initialDelaySeconds: 5
+        periodSeconds: 10
+      liveness:
+        path: /health
+        initialDelaySeconds: 15
+        periodSeconds: 20
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      limits:
+        cpu: 300m
+        memory: 256Mi
+    env:
+      - name: AUTH_USERS_FILE
+        value: /app/data/users.json
+    envFromConfig: true
+    envFromSecret: true
+    persistence:
+      enabled: true
+      mountPath: /app/data
+      accessModes:
+        - ReadWriteOnce
+      size: 1Gi
+      storageClassName: ""
+    podAnnotations: {}
+    nodeSelector: {}
+    tolerations: []
+    affinity: {}
+  predictionService:
+    enabled: true
+    image:
+      repository: 123456789012.dkr.ecr.ap-southeast-1.amazonaws.com/prediction-service
+      tag: latest
+      pullPolicy: IfNotPresent
+    replicaCount: 2
+    containerPort: 4002
+    service:
+      type: ClusterIP
+      port: 4002
+    probes:
+      readiness:
+        path: /health
+        initialDelaySeconds: 5
+        periodSeconds: 10
+      liveness:
+        path: /health
+        initialDelaySeconds: 15
+        periodSeconds: 20
+    hpa:
+      enabled: true
+      minReplicas: 2
+      maxReplicas: 6
+      averageUtilization: 70
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      limits:
+        cpu: 300m
+        memory: 256Mi
+    env:
+      - name: PREDICTIONS_FILE
+        value: /app/data/predictions.json
+    envFromConfig: true
+    envFromSecret: true
+    persistence:
+      enabled: true
+      mountPath: /app/data
+      accessModes:
+        - ReadWriteOnce
+      size: 1Gi
+      storageClassName: ""
+    podAnnotations: {}
+    nodeSelector: {}
+    tolerations: []
+    affinity: {}
+  aiInferenceService:
+    enabled: true
+    image:
+      repository: 123456789012.dkr.ecr.ap-southeast-1.amazonaws.com/ai-inference-service
+      tag: latest
+      pullPolicy: IfNotPresent
+    replicaCount: 2
+    containerPort: 8000
+    service:
+      type: ClusterIP
+      port: 8000
+    probes:
+      readiness:
+        path: /health
+        initialDelaySeconds: 5
+        periodSeconds: 10
+      liveness:
+        path: /health
+        initialDelaySeconds: 15
+        periodSeconds: 20
+    hpa:
+      enabled: true
+      minReplicas: 2
+      maxReplicas: 6
+      averageUtilization: 70
+    resources:
+      requests:
+        cpu: 200m
+        memory: 256Mi
+      limits:
+        cpu: 500m
+        memory: 512Mi
+    env: []
+    envFromConfig: true
+    envFromSecret: false
+    podAnnotations: {}
+    nodeSelector: {}
+    tolerations: []
+    affinity: {}
