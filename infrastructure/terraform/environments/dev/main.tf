@@ -19,14 +19,12 @@ module "ecr" {
 
 module "eks" {
   source             = "../../modules/eks"
-  project_name       = var.project_name
   cluster_name       = "${var.project_name}-cluster"
   private_subnet_ids = module.network.private_subnet_ids
 }
 
 module "rds" {
   source              = "../../modules/rds"
-  project_name        = var.project_name
   database_subnet_ids = module.network.database_subnet_ids
   vpc_id              = module.network.vpc_id
 }
@@ -37,8 +35,6 @@ module "s3" {
 }
 
 module "iam" {
-  source                   = "../../modules/iam"
-  project_name             = var.project_name
-  github_oidc_provider_arn = var.github_oidc_provider_arn
+  source                       = "../../modules/iam"
+  github_oidc_provider_arn     = var.github_oidc_provider_arn
 }
-

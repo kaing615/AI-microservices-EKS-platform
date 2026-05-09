@@ -10,8 +10,8 @@ import {
 } from "./services/api";
 
 const initialAuth = {
-  email: "user@example.com",
-  password: "user123",
+  email: import.meta.env.VITE_DEMO_EMAIL || "user@example.com",
+  password: import.meta.env.VITE_DEMO_PASSWORD || "user123",
   name: "Demo User",
 };
 
