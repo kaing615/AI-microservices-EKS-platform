@@ -36,5 +36,6 @@ module "s3" {
 
 module "iam" {
   source                       = "../../modules/iam"
+  project_name                 = var.project_name
   github_oidc_provider_arn     = var.github_oidc_provider_arn
 }

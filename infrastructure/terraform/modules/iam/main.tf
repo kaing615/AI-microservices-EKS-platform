@@ -1,3 +1,7 @@
+variable "project_name" {
+  type = string
+}
+
 data "aws_iam_policy_document" "github_assume_role" {
   statement {
     actions = ["sts:AssumeRoleWithWebIdentity"]
