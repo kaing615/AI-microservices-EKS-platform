@@ -29,24 +29,24 @@ jobs:
           IMAGE_TAG: ${{ github.sha }}
         run: |
           # Frontend
-          docker build -t $ECR_REGISTRY/frontend:$IMAGE_TAG ./frontend
-          docker push $ECR_REGISTRY/frontend:$IMAGE_TAG
+          docker build -t $ECR_REGISTRY/ai-platform-dev/frontend:$IMAGE_TAG ./frontend
+          docker push $ECR_REGISTRY/ai-platform-dev/frontend:$IMAGE_TAG
           
           # API Gateway
-          docker build -t $ECR_REGISTRY/api-gateway:$IMAGE_TAG ./api-gateway
-          docker push $ECR_REGISTRY/api-gateway:$IMAGE_TAG
+          docker build -t $ECR_REGISTRY/ai-platform-dev/api-gateway:$IMAGE_TAG ./api-gateway
+          docker push $ECR_REGISTRY/ai-platform-dev/api-gateway:$IMAGE_TAG
           
           # Auth Service
-          docker build -t $ECR_REGISTRY/auth-service:$IMAGE_TAG ./auth-service
-          docker push $ECR_REGISTRY/auth-service:$IMAGE_TAG
+          docker build -t $ECR_REGISTRY/ai-platform-dev/auth-service:$IMAGE_TAG ./auth-service
+          docker push $ECR_REGISTRY/ai-platform-dev/auth-service:$IMAGE_TAG
           
           # Prediction Service
-          docker build -t $ECR_REGISTRY/prediction-service:$IMAGE_TAG ./prediction-service
-          docker push $ECR_REGISTRY/prediction-service:$IMAGE_TAG
+          docker build -t $ECR_REGISTRY/ai-platform-dev/prediction-service:$IMAGE_TAG ./prediction-service
+          docker push $ECR_REGISTRY/ai-platform-dev/prediction-service:$IMAGE_TAG
           
           # AI Inference Service
-          docker build -t $ECR_REGISTRY/ai-inference-service:$IMAGE_TAG ./ai-inference-service
-          docker push $ECR_REGISTRY/ai-inference-service:$IMAGE_TAG
+          docker build -t $ECR_REGISTRY/ai-platform-dev/ai-inference-service:$IMAGE_TAG ./ai-inference-service
+          docker push $ECR_REGISTRY/ai-platform-dev/ai-inference-service:$IMAGE_TAG
           
           echo "All images pushed successfully!"
 
@@ -56,9 +56,6 @@ jobs:
         run: |
           # Update image tags in values.yaml
           sed -i "s/tag: latest/tag: $IMAGE_TAG/g" helm/ai-platform/values.yaml
-          
-          # Update all service images
-          sed -i "s|repository: .*ai-platform-dev/|repository: $ECR_REGISTRY/|g" helm/ai-platform/values.yaml
 
       - name: Commit updated values
         run: |
