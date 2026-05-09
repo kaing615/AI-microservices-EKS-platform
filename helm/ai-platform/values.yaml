@@ -36,9 +36,9 @@ services:
   frontend:
     enabled: true
     image:
-      repository: 123456789012.dkr.ecr.ap-southeast-1.amazonaws.com/frontend
+      repository: 616769007961.dkr.ecr.us-east-1.amazonaws.com/ai-platform-dev/frontend
       tag: latest
-      pullPolicy: IfNotPresent
+      pullPolicy: Always
     replicaCount: 2
     containerPort: 80
     service:
@@ -70,9 +70,9 @@ services:
   apiGateway:
     enabled: true
     image:
-      repository: 123456789012.dkr.ecr.ap-southeast-1.amazonaws.com/api-gateway
+      repository: 616769007961.dkr.ecr.us-east-1.amazonaws.com/ai-platform-dev/api-gateway
       tag: latest
-      pullPolicy: IfNotPresent
+      pullPolicy: Always
     replicaCount: 2
     containerPort: 4000
     service:
@@ -109,9 +109,9 @@ services:
   authService:
     enabled: true
     image:
-      repository: 123456789012.dkr.ecr.ap-southeast-1.amazonaws.com/auth-service
+      repository: 616769007961.dkr.ecr.us-east-1.amazonaws.com/ai-platform-dev/auth-service
       tag: latest
-      pullPolicy: IfNotPresent
+      pullPolicy: Always
     replicaCount: 2
     containerPort: 4001
     service:
@@ -152,9 +152,9 @@ services:
   predictionService:
     enabled: true
     image:
-      repository: 123456789012.dkr.ecr.ap-southeast-1.amazonaws.com/prediction-service
+      repository: 616769007961.dkr.ecr.us-east-1.amazonaws.com/ai-platform-dev/prediction-service
       tag: latest
-      pullPolicy: IfNotPresent
+      pullPolicy: Always
     replicaCount: 2
     containerPort: 4002
     service:
@@ -200,9 +200,9 @@ services:
   aiInferenceService:
     enabled: true
     image:
-      repository: 123456789012.dkr.ecr.ap-southeast-1.amazonaws.com/ai-inference-service
+      repository: 616769007961.dkr.ecr.us-east-1.amazonaws.com/ai-platform-dev/ai-inference-service
       tag: latest
-      pullPolicy: IfNotPresent
+      pullPolicy: Always
     replicaCount: 2
     containerPort: 8000
     service:
