@@ -3,10 +3,10 @@ name: CD GitOps
 on:
   workflow_dispatch:
   push:
-    branches: ["main"]
+    branches: ["main", "feat/**"]
 
 jobs:
-  update-manifests:
+  build-and-push:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -15,22 +15,55 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-region: ap-southeast-1
-          role-to-assume: ${{ secrets.AWS_GITHUB_ACTIONS_ROLE_ARN }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+          aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Login to ECR
         uses: aws-actions/amazon-ecr-login@v2
 
-      - name: Build and push api-gateway image
+      - name: Build and push all images
         env:
-          ECR_REGISTRY: ${{ secrets.ECR_REGISTRY }}
+          ECR_REGISTRY: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com
           IMAGE_TAG: ${{ github.sha }}
         run: |
+          # Frontend
+          docker build -t $ECR_REGISTRY/frontend:$IMAGE_TAG ./frontend
+          docker push $ECR_REGISTRY/frontend:$IMAGE_TAG
+          
+          # API Gateway
           docker build -t $ECR_REGISTRY/api-gateway:$IMAGE_TAG ./api-gateway
           docker push $ECR_REGISTRY/api-gateway:$IMAGE_TAG
+          
+          # Auth Service
+          docker build -t $ECR_REGISTRY/auth-service:$IMAGE_TAG ./auth-service
+          docker push $ECR_REGISTRY/auth-service:$IMAGE_TAG
+          
+          # Prediction Service
+          docker build -t $ECR_REGISTRY/prediction-service:$IMAGE_TAG ./prediction-service
+          docker push $ECR_REGISTRY/prediction-service:$IMAGE_TAG
+          
+          # AI Inference Service
+          docker build -t $ECR_REGISTRY/ai-inference-service:$IMAGE_TAG ./ai-inference-service
+          docker push $ECR_REGISTRY/ai-inference-service:$IMAGE_TAG
+          
+          echo "All images pushed successfully!"
 
-      - name: Placeholder for manifest update
+      - name: Update Helm values with image tags
+        env:
+          IMAGE_TAG: ${{ github.sha }}
         run: |
-          echo "Update overlay image tags here or in a separate GitOps repository."
-          echo "Then let ArgoCD sync the new revision."
+          # Update image tags in values.yaml
+          sed -i "s/tag: latest/tag: $IMAGE_TAG/g" helm/ai-platform/values.yaml
+          
+          # Update all service images
+          sed -i "s|repository: .*ai-platform-dev/|repository: $ECR_REGISTRY/|g" helm/ai-platform/values.yaml
 
+      - name: Commit updated values
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add helm/ai-platform/values.yaml
+          git diff --staged --quiet || git commit -m "chore: update helm image tags to ${{ github.sha }}"
+          git push
