@@ -1,4 +1,3 @@
-# Terraform state backend configuration for production
 terraform {
   backend "s3" {
     bucket         = "ai-platform-terraform-state-prod"
