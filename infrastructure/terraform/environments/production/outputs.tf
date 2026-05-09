@@ -1,4 +1,3 @@
-# EKS Cluster
 output "cluster_name" {
   value = module.eks.cluster_name
 }
@@ -37,7 +36,6 @@ output "ecr_repositories" {
   value = module.ecr.repositories
 }
 
-# RDS Database
 output "db_endpoint" {
   value = module.rds.db_endpoint
 }
@@ -61,7 +59,6 @@ output "db_password" {
   sensitive = true
 }
 
-# VPC Network
 output "vpc_id" {
   value = module.network.vpc_id
 }
@@ -74,12 +71,10 @@ output "database_subnet_ids" {
   value = module.network.database_subnet_ids
 }
 
-# S3 Buckets
 output "artifacts_bucket" {
   value = module.s3.artifacts_bucket_name
 }
 
-# IAM Roles
 output "github_oidc_role_arn" {
   value = module.iam.github_oidc_role_arn
 }
