@@ -37,7 +37,7 @@ services:
     enabled: true
     image:
       repository: 616769007961.dkr.ecr.us-east-1.amazonaws.com/ai-platform-dev/frontend
-      tag: latest
+      tag: 7c5e0db3059d8e76faaf2feb3bc9c3c39c566624
       pullPolicy: Always
     replicaCount: 2
     containerPort: 80
@@ -71,7 +71,7 @@ services:
     enabled: true
     image:
       repository: 616769007961.dkr.ecr.us-east-1.amazonaws.com/ai-platform-dev/api-gateway
-      tag: latest
+      tag: 7c5e0db3059d8e76faaf2feb3bc9c3c39c566624
       pullPolicy: Always
     replicaCount: 2
     containerPort: 4000
@@ -110,7 +110,7 @@ services:
     enabled: true
     image:
       repository: 616769007961.dkr.ecr.us-east-1.amazonaws.com/ai-platform-dev/auth-service
-      tag: latest
+      tag: 7c5e0db3059d8e76faaf2feb3bc9c3c39c566624
       pullPolicy: Always
     replicaCount: 2
     containerPort: 4001
@@ -153,7 +153,7 @@ services:
     enabled: true
     image:
       repository: 616769007961.dkr.ecr.us-east-1.amazonaws.com/ai-platform-dev/prediction-service
-      tag: latest
+      tag: 7c5e0db3059d8e76faaf2feb3bc9c3c39c566624
       pullPolicy: Always
     replicaCount: 2
     containerPort: 4002
@@ -201,7 +201,7 @@ services:
     enabled: true
     image:
       repository: 616769007961.dkr.ecr.us-east-1.amazonaws.com/ai-platform-dev/ai-inference-service
-      tag: latest
+      tag: 7c5e0db3059d8e76faaf2feb3bc9c3c39c566624
       pullPolicy: Always
     replicaCount: 2
     containerPort: 8000
